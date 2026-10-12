@@ -746,7 +746,7 @@ class MikuNightPlus extends Plugin {
 
 /* ---------------- 设置面板 ----------------
  * 本插件提供主题的全部设置：行为开关（拦按键 / 派发选区 / 写装饰）
- * 与显示类设置（写 CSS 变量、由主题 MikuNight.css 消费）。
+ * 与显示类设置（写 CSS 变量、由主题 theme.css 消费）。
  * 不依赖 Style Settings。
  */
 
@@ -758,6 +758,10 @@ class MikuNightPlusSettingTab extends PluginSettingTab {
 
   display() {
     const { containerEl } = this;
+    /* 上一次画出来的那 8 个预设按钮的 ResizeObserver 先全部断掉，再重建（见下面 paint 那段注释）。
+       不这么做的话，每开一次设置页就多留 8 个活着的观察者。 */
+    if (this._presetROs) for (const ro of this._presetROs) { try { ro.disconnect(); } catch (e) { /* 忽略 */ } }
+    this._presetROs = [];
     containerEl.empty();
     const s = this.plugin.settings;
     const save = async (alsoRedraw) => {
@@ -845,7 +849,10 @@ class MikuNightPlusSettingTab extends PluginSettingTab {
     this._phObserver = new MutationObserver(refreshPlaceholder);
     this._phObserver.observe(document.body, { attributes: true, attributeFilter: ['style'] });
     const el0 = fontInputEl();
-    if (el0) el0.addEventListener('blur', refreshPlaceholder);
+    /* 用 registerDomEvent 而不是 addEventListener：官方插件指南要求自己加的监听走这个口，
+       卸载插件时 Obsidian 会统一摘掉（元素本身随 containerEl.empty() 消失，不算泄漏，
+       但 review 会看这一条）。 */
+    if (el0) this.plugin.registerDomEvent(el0, 'blur', refreshPlaceholder);
 
     /* ================= 行距 ================= */
     containerEl.createEl('h3', { text: t('section.spacing') });
@@ -925,8 +932,13 @@ class MikuNightPlusSettingTab extends PluginSettingTab {
       requestAnimationFrame(() => {
         paint();
         if (typeof ResizeObserver !== 'undefined') {
-          btn._mnRO = new ResizeObserver(paint);
-          btn._mnRO.observe(btn);
+          /* ⚠️ 观察者必须记在**面板实例**上、下次重画时先断开。
+             挂在按钮上（btn._mnRO）等于永远没人管：display() 每次重画都新建 8 个，
+             旧按钮连同它的观察者一起被丢掉，但观察者还活着、还攥着那些脱离文档的元素
+             —— 反复开设置页就是一路泄漏（2026-08-12 审计发现，2026-10-12 修）。 */
+          const ro = new ResizeObserver(paint);
+          ro.observe(btn);
+          this._presetROs.push(ro);
         }
       });
 
