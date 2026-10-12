@@ -1,0 +1,200 @@
+/* ==================================================================
+ * MikuNight++ 样式
+ * 只负责插件自己写进 DOM 的装饰类。显示类设置（空行、公式字号、行号字体）
+ * 走 CSS 变量，由主题 MikuNight.css 消费，不在这里。
+ * 原则：全部走 em / 相对单位，任何字号、任何缩放比例下表现一致。
+ * ================================================================== */
+
+/* ---------- 行内标记：只保留光标所在行 ---------- */
+/* 打开「隐藏非选中行的标记」时：
+ *   .mn-marker-hidden  非选中行的标记 → 完全隐藏
+ *   .mn-marker-shown   光标所在行     → 淡显（保留颜色区分度）
+ * 不能对真实的 marker span 用 display:none —— CM6 的光标定位依赖元素存在，
+ * 所以隐藏用 opacity。 */
+.mn-marker-hidden {
+  opacity: 0;
+  user-select: none;
+}
+.mn-marker-shown {
+  opacity: 0.55;
+}
+
+/* ---------- 分割线兜底 ---------- */
+/* 让手动插入的 <hr> 与「--- 渲染出的分割线」长得一样，颜色跟随主题色。
+   注意：主题 MikuNight.css 里也有一条 hr 规则（实色主题色、带 !important），
+   会压过这里 —— 那是有意的：主题负责最终观感，这里只是插件单独使用时的兜底。 */
+.markdown-source-view.mod-cm6 .cm-line > hr,
+.markdown-rendered hr {
+  border: none;
+  border-bottom: 0.1em solid color-mix(in oklab, var(--text-accent, currentColor) 45%, transparent);
+  border-radius: 0.1em;
+  height: 0;
+  margin-block: 1.2em;
+}
+
+/* ---------- 配色预设：一行四个，填满整行 ---------- */
+/* ⚠️ 选择器必须写成 `button.mn-preset-btn`（特异度 0,1,1），不能只写 `.mn-preset-btn`（0,1,0）。
+   原因（从 obsidian.asar 的 app.css 里翻出来的）：
+     button:not(.clickable-icon) { background-color: var(--interactive-normal); box-shadow: var(--input-shadow); }
+   它也是 (0,1,1)，压过单类选择器 —— 表现就是「色块全是深灰、我的填充色完全没上」。
+   同权重靠加载顺序取胜，插件样式在 app.css 之后加载，所以打平即可赢。
+   另外 Obsidian 还用裸 `button` 设了 display/justify/align/font-size/border-radius，这里一律显式覆盖。
+   视觉：纯色平面 —— 无渐变、无边框、无投影，hover 只动透明度，整块就是那套配色本身。 */
+.mn-preset-hint {
+  margin: 0 0 0.5em;
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  line-height: 1.5;
+}
+
+.mn-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);   /* 一行四个，自动填满整行 */
+  gap: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+button.mn-preset-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  width: 100%;
+  height: auto;                            /* 覆盖 Obsidian 按钮的固定高度 */
+  min-height: 2.6em;
+  margin: 0;
+  padding: 0.6em 0.9em;
+  /* 外圈 2px 边带 = 你说的"外 margin 包一圈"。做法：边框 2px，背景不铺到边框下面，
+     图形自然内缩 2px，等于给按钮留了一圈外带（不用真的加 margin，那会改变布局）。
+     边带颜色取 Obsidian 的背景色变量，所以看起来就是"按钮被切出来、外面是面板"。
+     ⚠️ 背景图（SVG）自己已经带了圆角，所以这里**不需要** background-clip / border-radius
+     去裁它 —— 少一层依赖就少一种"图形突然不显示"的可能（踩过一次）。 */
+  border: 2px solid var(--background-primary, rgba(0, 0, 0, 0.35));
+  border-radius: 0.55em;                       /* 只用于兜底底色 */
+  background-color: var(--mn-preset-accent);   /* 兜底：底图没生成出来时至少是纯强调色 */
+  background-origin: border-box;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  box-shadow: none;
+  color: #1a1a1a;
+  font-family: inherit;
+  font-size: var(--font-ui-small);
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: start;
+  cursor: pointer;
+  transition: opacity 120ms ease;
+}
+/* 注：这里**不要**加 ::after / ::before 之类的装饰线 —— 之前加过一条背景色细线，
+   视觉上像突兀的下划线，用户明确不要。斜角已经由底图承担。 */
+
+/* hover / 按下都只动透明度；底色必须重申一遍（否则会被 button:hover 的 --interactive-hover 盖掉） */
+button.mn-preset-btn:hover {
+  background-color: var(--mn-preset-accent);
+  box-shadow: none;
+  opacity: 0.88;
+}
+
+button.mn-preset-btn:active {
+  background-color: var(--mn-preset-accent);
+  box-shadow: none;
+  opacity: 0.75;
+}
+
+button.mn-preset-btn:focus-visible {
+  box-shadow: 0 0 0 2px var(--text-accent);
+}
+
+/* 名字永远压在斜角之上（选中态的压暗层是 z-index 1，所以名字给 2） */
+button.mn-preset-btn .mn-preset-name {
+  position: relative;
+  z-index: 2;
+}
+
+/* 当前应用的那套：文字换成「正在应用」，并压暗一档明确区分于可点状态。
+   压暗用黑色叠加而不是 filter —— filter 会把色相和彩度一起带偏。 */
+button.mn-preset-btn.is-active,
+button.mn-preset-btn.is-active:hover {
+  opacity: 1;
+  cursor: default;
+}
+
+button.mn-preset-btn.is-active::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;                              /* 盖住底色和斜角，但被名字压住 */
+  background: rgba(0, 0, 0, 0.28);
+}
+
+button.mn-preset-btn.is-active .mn-preset-name {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* ---------- 第三行：自定义取色（独占一行，内容横排、不换行） ---------- */
+.mn-custom-row {
+  display: flex;
+  flex-flow: row nowrap;                    /* 明确禁止换行 */
+  align-items: center;
+  gap: 0.8em;
+  box-sizing: border-box;
+  padding: 0.55em 0.9em;
+  border-radius: 0.5em;
+  background: var(--background-modifier-hover);   /* 中性底：这块不表示某套配色 */
+  font-size: var(--font-ui-small);
+}
+
+.mn-custom-row .mn-preset-name {
+  color: var(--text-normal);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mn-custom-row.is-active .mn-preset-name {
+  color: var(--text-accent);
+  font-weight: 700;
+}
+
+.mn-picker-row {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  gap: 1.2em;
+  margin-inline-start: auto;                /* 两个取色器靠右，标签靠左 */
+}
+
+.mn-picker {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;                      /* 「强调」「背景」和色块同一行 */
+  gap: 0.4em;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+  font-weight: 400;
+  cursor: pointer;
+  white-space: nowrap;                      /* 不许换行 */
+}
+
+input.mn-picker-input {
+  flex: none;
+  width: 1.6em;
+  height: 1.2em;
+  padding: 0;
+  border: none;
+  border-radius: 0.25em;
+  background: none;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+input.mn-picker-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input.mn-picker-input::-webkit-color-swatch {
+  border: none;
+  border-radius: 0.25em;
+}
+

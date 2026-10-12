@@ -1,0 +1,9 @@
+{
+  "id": "mikunight-plus",
+  "name": "MikuNight++",
+  "version": "0.3.0",
+  "minAppVersion": "1.6.0",
+  "description": "Companion enhancements for the MikuNight theme: accent hue control, on-demand hiding of inline markup, cursor-state hints, math font scaling, percentage image sizing, and the typographic fixes that plain CSS cannot do.",
+  "author": "AsparagiSanae",
+  "isDesktopOnly": false
+}
