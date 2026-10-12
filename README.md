@@ -1,145 +1,150 @@
 # MikuNight++
 
-MikuNight 主题的配套增强插件。提供主题的全部设置项，并做那些**纯 CSS 做不到**的事：需要读取编辑器状态、语法树、光标位置，或需要改写文档的行为。
+The companion enhancement plugin for the MikuNight theme. It provides every setting the theme has, and does the things **plain CSS cannot**: the ones that need to read editor state, the syntax tree or the cursor position, or that need to rewrite the document.
 
-**不依赖任何其他插件**（不需要 Style Settings）。**主题也不依赖本插件** —— 主题可以单独使用，只是没有设置界面，改 `theme.css` 里的 `:root` 变量即可。
+**It does not depend on any other plugin** (Style Settings not needed). **The theme does not depend on this plugin either** — the theme works on its own; you just get no settings panel, so you edit the `:root` variables in `theme.css` instead.
 
-## 全部设置项（设置 → MikuNight++）
+- Companion theme: [MikuNight](https://github.com/AsparagiSanae/obsidian-mikunight) (GPL-3.0)
+- This plugin: MIT, see [LICENSE](./LICENSE)
+- Requires Obsidian **1.6.0** or later (see `minAppVersion` in `manifest.json`)
 
-**标记显示**：
+## All settings (Settings → MikuNight++)
 
-| 项 | 说明 |
+![Settings panel](screenshot.png)
+
+**Markup display**:
+
+| Item | Description |
 | --- | --- |
-| 隐藏非选中行的标记 | 打开：光标所在行的标记淡显（55%），其它行的标记全部隐藏，视线只落在正在编辑的那一行。关掉：回到 Obsidian 原生 —— 所有行的标记都用正常颜色显示（比如围住公式块的上下两对 `$$`）。 |
-| 退格整对删除标记 | 在 `**|**` 这类边界按一次退格删掉两侧标记；光标紧跟闭标记时一次删掉整个元素 |
+| Hide markup on unselected lines | On: markup on the cursor line is dimmed (55%) and markup on every other line is hidden, so your eye stays on the line you are editing. Off: back to Obsidian's native behavior — markup on all lines is drawn in the normal color (the two pairs of `$$` around a formula block, for example). |
+| Delete paired markup with one backspace | At a boundary like `**\|**`, one backspace removes the markers on both sides; with the cursor right after a closing marker, one backspace removes the whole element |
 
-**行号槽**：
+**Gutter**:
 
-| 项 | 说明 |
+| Item | Description |
 | --- | --- |
-| 点击行号槽可选中整行 | 点行号即选中该行全文 |
-| 行号字体名 | 建议选数字等宽的字体。**留空时，输入框里的灰色占位符会自动写成回落目标**（= 外观设置里等宽字体的字体名，例如 `Maple NF CN`），所以不用猜"回落到等宽字体"到底是哪个字体。占位符只是显示，**不用**照抄 —— 尤其别给它加引号：引号是 CSS 里"名字含空格"的书写规则，插件写变量时会自己补 |
+| Click the gutter to select the whole line | Clicking a line number selects that whole line |
+| Line number font name | A font with tabular digits is recommended. **When left empty, the gray placeholder in the text box writes itself the fallback target** (= the name of the monospace font in Appearance settings, e.g. `Maple NF CN`), so you never have to guess which font "fall back to monospace" actually means. The placeholder is display only — **do not** copy it, and above all do not add quotes to it: quotes are the CSS way of writing "a name containing spaces", and the plugin adds them itself when it writes the variable |
 
-**行距 / 公式**（写到 CSS 变量上，由主题 `theme.css` 消费）：
+**Line spacing / formulas** (written to CSS variables, consumed by the theme's `theme.css`):
 
-| 项 | 对应变量 | 说明 |
+| Item | Variable | Description |
 | --- | --- | --- |
-| 空行高度系数 | `--mn-empty-line` | 空行高度 = 正文行高 × 系数 |
-| 压缩空行间距 | `--mn-empty-pad` | 把空行上下的结构性留白一并删去 |
-| 公式字号系数 | `--mn-math-scale` | 公式字号 = 正文字号 × 系数（滑杆 0.8 – 2.0，步长 0.02，默认 **0.96** ≈ 原生观感） |
+| Blank line height coefficient | `--mn-empty-line` | Blank line height = body line height × coefficient |
+| Compress blank line spacing | `--mn-empty-pad` | Also removes the structural whitespace above and below a blank line |
+| Formula scale | `--mn-math-scale` | Formula size = body size × coefficient (slider 0.8 – 2.0, step 0.02, default **0.96** ≈ the native look) |
 
-**其他**：一键「恢复默认设置」。
+**Other**: a one-click "Restore default settings".
 
-改动**立即生效**，不需要重载插件：CSS 变量用行内样式写在 `body` 上（优先级高于主题的 `:root`），退格行为用 CodeMirror 的 `Compartment` 热重配。
+Changes **take effect immediately**, with no plugin reload: the CSS variables are written as inline styles on `body` (higher priority than the theme's `:root`), and the backspace behavior is reconfigured live through a CodeMirror `Compartment`.
 
-**但改 `main.js` 本身必须重载插件**（插件列表里关一次再开）。
+**But editing `main.js` itself does require a plugin reload** (toggle it off and on in the plugin list).
 
-⚠️ 确认"新的 `main.js` 到底进内存没有"，读插件实例上的 `buildVersion`：
+⚠️ To confirm "whether the new `main.js` actually made it into memory", read `buildVersion` on the plugin instance:
 
 ```js
 app.plugins.plugins['mikunight-plus'].buildVersion   // → '0.3.0'
 ```
 
-它取自 `main.js` 里的 `BUILD_VERSION` 常量。**不要读 `this.manifest.version`**：Obsidian 在启动时就把清单读进内存缓存了（`app.plugins.manifests`），**重载插件不会重读它**，所以那个值会滞后 —— 实测把 manifest 改成 0.3.0 再重载插件，它仍然回 `0.2.1`。改版本号务必两处一起改，`check-i18n.mjs` 会核对。
+It comes from the `BUILD_VERSION` constant in `main.js`. **Do not read `this.manifest.version`**: Obsidian reads the manifest into its in-memory cache at startup (`app.plugins.manifests`), and **reloading the plugin does not read it again**, so that value lags behind — measured on a real instance, changing the manifest to 0.3.0 and reloading the plugin still returned 0.2.1. Always change the version in both places.
 
-（设置页顶部原本显示这行版本号，0.3.0 里已按要求删掉，面板不再挂版本号。）
+(The top of the settings page used to display this version number; it was removed in 0.3.0 as requested, so the panel carries no version any more.)
 
-**卸载本插件后**，主题会干净回落到自己 `:root` 里的默认值 —— 插件写的行内变量在 `onunload` 里全部摘掉。
+**After you uninstall or disable this plugin**, the theme falls back cleanly to the defaults in its own `:root` — every inline variable the plugin wrote is removed in `onunload`.
 
-## 多语言
+## Languages
 
-界面文案有**简体中文 / 英语**两套。所有用户可见的字符串都集中在 `main.js` 顶部的 `LOCALES` 表里（第一块，只有字没有逻辑），代码一律用 `t('键')` 取，不写字符串字面量 —— 加文案就是两张表各加一行。
+The interface strings come in two sets, **Simplified Chinese / English**. Every user-visible string sits in the `LOCALES` table at the top of `main.js` (the first block, text only, no logic), and the code always goes through `t('key')` instead of string literals — adding a string means adding one row to each of the two tables.
 
-语言按下面的顺序判定，取第一个非空的值：
+The language is resolved in the order below, taking the first non-empty value:
 
-| 顺序 | 来源 | 说明 |
+| Order | Source | Description |
 | --- | --- | --- |
-| ① | `document.documentElement.lang` | Obsidian 启动时按「设置 → 关于 → 语言」写到 `<html>` 上（`zh` / `zh-TW` / `en`…），最准 |
-| ② | `localStorage.language` | 同一个值的原始存放处，① 读不到时兜底 |
-| ③ | `navigator.language` | 系统语言，最后兜底 |
+| ① | `document.documentElement.lang` | What Obsidian writes to `<html>` at startup from **Settings → About → Language** (`zh` / `zh-TW` / `en`…); the most accurate |
+| ② | `localStorage.language` | Where that same value is originally stored; the fallback when ① cannot be read |
+| ③ | `navigator.language` | The system language; the last fallback |
 
-**只认简体中文**：`zh` / `zh-CN` / `zh-SG` / `zh-Hans*` → 中文；其余一律英语 —— **包括繁体**（`zh-TW` / `zh-HK` / `zh-Hant*` 也走英语，不做将就）。
+**Simplified Chinese only**: `zh` / `zh-CN` / `zh-SG` / `zh-Hans*` → Chinese; everything else → English — **Traditional Chinese included** (`zh-TW` / `zh-HK` / `zh-Hant*` go to English as well, no compromises).
 
-语言在模块加载时解析一次，所以改 `main.js` 后同样要重载插件；换 Obsidian 界面语言本身就要重启应用，因此没做运行时热切换。（解析结果挂在插件实例的 `locale` 上，排查时 `app.plugins.plugins['mikunight-plus'].locale` 一眼能看出读到了什么。）
+The language is resolved once, when the module loads, so a change to `main.js` again requires a plugin reload; changing Obsidian's own interface language needs an app restart anyway, which is why there is no runtime hot-switch. (The result is stored on the plugin instance as `locale`, so while you are debugging, `app.plugins.plugins['mikunight-plus'].locale` tells you at a glance what was read.)
 
-### 插件列表里那行介绍也跟语言走
+### The plugin list description follows the language too
 
-Obsidian **没有**任何按语言切换插件元信息的机制（`manifest.json` 里也没有 i18n 相关字段，社区里甚至有人专门写插件去翻译别人插件的描述）。但插件可以**改自己**：清单在内存里就是个普通对象，而且和 `plugin.manifest` 是同一个对象，所以 `onload` 里一句
+Obsidian has **no** mechanism for switching plugin metadata by language (there is no i18n field in `manifest.json` either, and some people in the community have even written plugins specifically to translate other plugins' descriptions). But a plugin can **change itself**: the manifest in memory is an ordinary object, and it is the same object as `plugin.manifest`, so one line in `onload`
 
 ```js
 this.manifest.description = t('manifest.description');
 ```
 
-就能让「设置 → 第三方插件」列表显示当前语言。
+is enough to make the **Settings → Community plugins** list show the current language.
 
-实测（2026-10-12）踩到的两点，写下来免得白试：
+Two gotchas from measuring this on a real instance (2026-10-12), written down so you don't waste the same attempts:
 
-- 改完 **不重画**列表 DOM 不会变，切设置页也不重建（这块 Obsidian 没有响应式）；
-- 但**重载插件会重画那一行**，并且是从这个对象取值 —— 而 `onload` 正好发生在用户打开设置之前，所以生产路径成立。正反两个方向都验过（`verify-plugindesc-cdp.mjs`）。
+- Once changed, the list DOM does not update unless it is **redrawn**, and switching settings pages does not rebuild it either (this part of Obsidian has no reactivity);
+- but **reloading the plugin does redraw that row**, and it reads the value from this same object — and `onload` happens right before the user opens settings, so the production path holds. Verified in both directions.
 
-`manifest.json` 里那份写**英文**：社区目录全局可见，而且插件没启用（或安全模式）时用户看到的就是磁盘上那份，没机会被覆盖。中文靠上面这句运行时盖上去。离线自检第 ⑦ 条盯着「两份必须逐字一致」。
+The copy in `manifest.json` is written in **English**: the community directory is visible to everyone, and while the plugin is not enabled (or in safe mode) what the user sees is the copy on disk, with no chance of being overwritten. Chinese is layered on at runtime by the line above.
 
-三个自检脚本（都在 `项目/MikuNight/tools/`）：
+The scripts used to verify the localization (one offline static check, two live CDP comparisons and a screenshot tool) are **not shipped with this repository** — they depend on the author's own vault layout and on a CDP debugging port, so they would not run anywhere else. The comments next to the `LOCALES` table at the top of `main.js` say what each of them checks.
 
-```powershell
-node 项目/MikuNight/tools/check-i18n.mjs            # 离线：语法 / 两张表键对齐 / 与译文源逐字比对 / 代码区残留写死文案 / 语言标签映射 / 版本号 / manifest 描述一致
-node 项目/MikuNight/tools/verify-i18n-cdp.mjs       # 真机：强制 zh 与 en 各重载一次插件，把设置面板的全部文字读回来比对
-node 项目/MikuNight/tools/verify-plugindesc-cdp.mjs # 真机：读「已安装插件」列表里真正渲染出来的那行介绍（需要开着设置窗口）
-node 项目/MikuNight/tools/shot-i18n-panel.mjs       # 真机：给设置面板拍中英对照图（打到 项目/MikuNight/shots/）
-```
+## What the plugin implements (and why CSS alone cannot do it)
 
-## 插件负责的实现（为什么不能只靠 CSS）
-
-| 功能 | 为什么 CSS 做不到 |
+| Feature | Why CSS cannot do it |
 | --- | --- |
-| 隐藏非选中行的标记 | 需要知道光标在哪一行，并把装饰逐段写到语法树的标记节点上（原生对所有行一视同仁） |
-| 成对标记整对删除 | 需要拦截按键并改写文档 |
-| 插入分割线命令 | 属于语法解析层面（`文本` 紧跟 `---` 会被解析成 setext h2） |
-| 点击行号槽选中整行 | 需要接管 mousedown 并派发选区 |
+| Hide markup on unselected lines | It needs to know which line the cursor is on, and to write decorations segment by segment onto the markup nodes of the syntax tree (natively, every line is treated the same) |
+| Delete paired markup as a pair | It needs to intercept the key and rewrite the document |
+| Insert horizontal rule command | It is a parsing-level matter (`text` immediately followed by `---` parses as a setext h2) |
+| Click the gutter to select the whole line | It needs to take over mousedown and dispatch a selection |
 
-## 设计约束
+## Design constraints
 
-**所有尺寸用 em / 相对单位，不写死像素。** 任何字号、任何缩放比例下表现必须一致，不允许出现「16px 时对齐、20px 时散了」。
+**Every size is in em / relative units, never hardcoded pixels.** The result has to be identical at any font size and any zoom level; "aligned at 16px, falling apart at 20px" is not allowed.
 
-实测验证（把编辑器字号分别设为 14 / 20 / 28px，归一化到 em 后取值）：
+Measured on a real instance (editor font size set to 14 / 20 / 28px, values taken after normalizing to em):
 
-| 量 | 14px | 20px | 28px |
+| Quantity | 14px | 20px | 28px |
 | --- | --- | --- | --- |
-| 列表每级步进 | 1.5em | 1.5em | 1.5em |
-| bullet → 文字 | 1.6em | 1.6em | 1.6em |
-| 公式 / 正文 | 1.100 | 1.100 | 1.100 |
-| 图片居中偏差 | 0px | 0px | 0px |
+| List step per level | 1.5em | 1.5em | 1.5em |
+| bullet → text | 1.6em | 1.6em | 1.6em |
+| Formula / body | 0.960 | 0.960 | 0.960 |
+| Image centering offset | 0px | 0px | 0px |
 
-## 安装
+The formula row equals the default of `--mn-math-scale` — a pure ratio, and therefore independent of font size (measured on a real instance: at a 15px base the formula renders at 14.4px, a ratio of 0.96; setting the variable to 1.2 gives 18px).
 
-1. 设置 → 第三方插件 → 已安装插件，启用 **MikuNight++**
-2. 设置 → **MikuNight++**：行为开关 3 项 + 显示设置 4 项 + 配色 1 项
+## Installation
 
-无构建步骤：`main.js` 直接是 CommonJS，改完在插件列表里开关一次即可重载。界面文案随 Obsidian 的界面语言自动切换（简体中文 / 英语），不需要额外配置。
+**From the community directory** (once listed): Settings → Community plugins → Browse → search for `MikuNight++` → Install, then enable it.
 
-## 已知边界
+**Manually**: copy `main.js`, `manifest.json` and `styles.css` into `<your vault>/.obsidian/plugins/mikunight-plus/`, then enable it under **Settings → Community plugins → Installed plugins**.
 
-- **空元素形态是启发式的。** `****` 在 markdown 里本身歧义，Obsidian 会把四个星号解析成「1 开 + 3 闭」，成对匹配对它无效。插件改为识别「同类分隔符连续 4 个、光标在中缝」这条规则。因此它只在 Ctrl+B 命中空行的典型场景生效。
-- **`---` 变标题修不了。** 那是 CommonMark 的 setext 语义，除非替换 markdown 解析器。请用「插入分割线」命令写 `<hr>`，或在段落与 `---` 之间空一行。
-- **标记隐藏是"全或全无"，不是逐行渐隐。** 开关只有两档：要么只显示光标所在行的标记（淡显 55%），要么所有行都正常显示。不会出现"某些行淡、某些行正常"的中间态。
-- **多光标时以"有哪些行被选中"为准。** 多选或整行选中（比如点行号槽）时，那一行的标记会淡显。
-- **主题侧的显示效果依赖主题 CSS。** 本插件的四个显示设置只是往 CSS 变量里写值，实际样式由配套主题的 `theme.css` 定义；换别的主题这些设置不起作用。
+Once enabled: Settings → **MikuNight++** — 3 behavior toggles, 4 display settings, 1 color setting, plus restore-defaults.
 
-## 致谢与许可
+No build step: `main.js` is plain CommonJS, so after an edit you toggle the plugin off and on in the plugin list to reload it. Interface strings follow Obsidian's interface language automatically (Simplified Chinese / English), with no extra configuration.
 
-本插件的两条编辑行为移植自[思源笔记](https://github.com/siyuan-note/siyuan)的操作习惯：
+## Known limits
 
-- **两种换行**：思源里 `Shift+Enter` 是小换行、`Enter` 是大换行，两者的行距明显不同。本插件把这个特性搬到 Obsidian —— 直接 `Enter` 再输入是「小换行」（正文行距），连按两次 `Enter` 再输入就是「大换行」（空一行 = 2 倍行距 = 分段），由主题的 `--mn-empty-line` 实现。
-- **点空白选中整行**：思源没有行号槽，但点「侧边栏与编辑区之间那条空白」就能选中对应的一整行。Obsidian 有行号槽，这里把同一个交互挂在行号上。
+- **The empty-element shape is a heuristic.** `****` is ambiguous in markdown to begin with: Obsidian parses the four asterisks as "1 opening + 3 closing", and pair matching is useless against it. The plugin instead recognizes the rule "4 consecutive delimiters of the same kind, cursor in the middle gap". It therefore only works in the typical case of Ctrl+B hitting an empty line.
+- **A `---` turning into a heading cannot be fixed.** That is CommonMark setext semantics, short of replacing the markdown parser. Use the "Insert horizontal rule" command to write `<hr>`, or leave a blank line between the paragraph and the `---`.
+- **Markup hiding is all-or-nothing, not a per-line fade.** The toggle has only two positions: either only the cursor line's markup shows (dimmed 55%), or every line shows normally. There is no in-between state where "some lines are dim and some are normal".
+- **With multiple cursors, what counts is which lines are selected.** Under a multi-selection or a whole-line selection (clicking the gutter, for example), that line's markup is dimmed.
+- **The visual result depends on the theme's CSS.** This plugin's four display settings only write values into CSS variables; the actual styling is defined by the companion theme's `theme.css`. With any other theme those settings do nothing.
 
-配色方面，本插件只负责往 CSS 变量里写值（六个 HSL 裸数字），不参与任何派生计算。这套配色的默认取值参考了思源主题 [Neo](https://github.com/QYLexpired/Neo)（作者 QYL）的 Midnight 配色，公式源码的色值取自 [Catppuccin](https://github.com/catppuccin/catppuccin)（MIT）。
+## Credits and license
 
-插件代码为独立实现，不含上述项目的任何代码，与之也没有隶属关系。配套主题 MikuNight 基于 Neo 改造、按 GPL-3.0 发布；本插件与它许可证相互独立。
+Two of this plugin's editing behaviors are ported from the habits of [SiYuan](https://github.com/siyuan-note/siyuan):
 
-**许可证**：MIT，见 [LICENSE](./LICENSE)。
+- **Two kinds of line break**: in SiYuan `Shift+Enter` is a soft break and `Enter` is a hard break, with a clearly different line spacing between them. This plugin brings that to Obsidian — pressing `Enter` and typing is a soft break (body line spacing), while pressing `Enter` twice and typing is a hard break (one blank line = 2× line spacing = a paragraph break), implemented by the theme's `--mn-empty-line`.
+- **Click blank space to select the whole line**: SiYuan has no gutter, but clicking "the blank strip between the sidebar and the editor" selects the whole line there. Obsidian has a gutter, so the same interaction is hung on the line number here.
 
-## 文件
+On colors, this plugin only writes values into CSS variables (six bare HSL numbers) and takes no part in any derived computation. The default values of this palette follow the Midnight color scheme of the SiYuan theme [Neo](https://github.com/QYLexpired/Neo) by QYL, and the formula source colors come from [Catppuccin](https://github.com/catppuccin/catppuccin) (MIT).
 
-- `manifest.json` — 插件元信息
-- `main.js` — 全部逻辑（无构建步骤）。文件分两块：**第一块 `LOCALES` 文案表 + `t()`**，第二块功能实现
-- `styles.css` — 插件写进 DOM 的装饰类样式（标记隐藏 / 淡显），全 em 单位
+The plugin code is an independent implementation; it contains no code from the projects above and is not affiliated with them. The companion theme [MikuNight](https://github.com/AsparagiSanae/obsidian-mikunight) is built on Neo and released under GPL-3.0; its license and this plugin's are independent of each other.
+
+**License**: MIT, see [LICENSE](./LICENSE).
+
+## Files
+
+- `manifest.json` — plugin metadata
+- `main.js` — all the logic (no build step). The file has two blocks: **the first is the `LOCALES` string tables plus `t()`**, the second is the implementation
+- `styles.css` — styles for the decoration classes the plugin writes into the DOM (markup hidden / dimmed), all in em units
+- `versions.json` — version → required minimum app version; Obsidian's updater uses it to decide whether an update can be installed
