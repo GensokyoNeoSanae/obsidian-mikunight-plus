@@ -65,8 +65,9 @@ const LOCALES = {
   zh: {
     /* 插件列表里那行介绍。manifest.json 里写的是英文（社区目录全局可见），
        中文这份由 onload 覆盖上去，见 onload 里的说明。 */
-    'manifest.description': 'MikuNight 主题的配套增强：强调色色调、行内标记按需隐藏、光标态提示、'
-      + '公式字号跟随、百分比图片尺寸、以及那些纯 CSS 做不到的排版修正。',
+    'manifest.description': 'MikuNight 主题的配套插件：主题全部设置项（八套配色预设、空行高度、'
+      + '公式字号、行号字体…），加上那些纯 CSS 做不到的编辑行为 —— 隐藏非光标行的标记、'
+      + '退格整对删除标记、点击行号槽选中整行。',
 
     'cmd.insertHr': '插入分割线（<hr>，不会被解析成标题）',
 
@@ -120,7 +121,7 @@ const LOCALES = {
   en: {
     /* 这一条与 manifest.json 里的 description 必须逐字一致（check-i18n.mjs 第 ⑦ 条核对）：
        插件没被启用 / 安全模式下，用户看到的就是磁盘上那份，没机会被 onload 覆盖。 */
-    "manifest.description": "Companion enhancements for the MikuNight theme: accent hue control, on-demand hiding of inline markup, cursor-state hints, math font scaling, percentage image sizing, and the typographic fixes that plain CSS cannot do.",
+    "manifest.description": "Companion plugin for the MikuNight theme: a settings panel for the theme's variables (eight palette presets, spacing, math scale, gutter font) and the editor behaviours CSS cannot do, such as hiding markup off the cursor line.",
 
     "cmd.insertHr": "Insert divider (<hr>, not parsed as a heading)",
 

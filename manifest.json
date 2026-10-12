@@ -3,7 +3,7 @@
   "name": "MikuNight++",
   "version": "0.3.0",
   "minAppVersion": "1.6.0",
-  "description": "Companion enhancements for the MikuNight theme: accent hue control, on-demand hiding of inline markup, cursor-state hints, math font scaling, percentage image sizing, and the typographic fixes that plain CSS cannot do.",
+  "description": "Companion plugin for the MikuNight theme: a settings panel for the theme's variables (eight palette presets, spacing, math scale, gutter font) and the editor behaviours CSS cannot do, such as hiding markup off the cursor line.",
   "author": "AsparagiSanae",
   "isDesktopOnly": false
 }

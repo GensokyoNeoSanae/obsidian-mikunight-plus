@@ -4,13 +4,7 @@ MikuNight 主题的配套增强插件。提供主题的全部设置项，并做�
 
 **不依赖任何其他插件**（不需要 Style Settings）。**主题也不依赖本插件** —— 主题可以单独使用，只是没有设置界面，改 `theme.css` 里的 `:root` 变量即可。
 
-- 配套主题：[MikuNight](https://github.com/AsparagiSanae/obsidian-mikunight)（GPL-3.0）
-- 本插件：MIT，见 [LICENSE](./LICENSE)
-- 最低支持 Obsidian **1.6.0**（见 `manifest.json` 的 `minAppVersion`）
-
 ## 全部设置项（设置 → MikuNight++）
-
-![设置面板](screenshot.png)
 
 **标记显示**：
 
@@ -38,19 +32,19 @@ MikuNight 主题的配套增强插件。提供主题的全部设置项，并做�
 
 改动**立即生效**，不需要重载插件：CSS 变量用行内样式写在 `body` 上（优先级高于主题的 `:root`），退格行为用 CodeMirror 的 `Compartment` 热重配。
 
-**但改 `main.js` 本身必须重载插件**（插件列表里关一次再开），而**设置面板不会因为插件重载而重画** —— 它只在打开时画一次，要看到新代码得把面板关掉再打开。
+**但改 `main.js` 本身必须重载插件**（插件列表里关一次再开）。
 
-**卸载本插件后**，主题会干净回落到自己 `:root` 里的默认值 —— 插件写的行内变量在 `onunload` 里全部摘掉。
-
-### 开发提示：怎么确认新代码真的生效了
-
-读插件实例上的 `buildVersion`：
+⚠️ 确认"新的 `main.js` 到底进内存没有"，读插件实例上的 `buildVersion`：
 
 ```js
 app.plugins.plugins['mikunight-plus'].buildVersion   // → '0.3.0'
 ```
 
-它取自 `main.js` 里的 `BUILD_VERSION` 常量。**不要读 `this.manifest.version`**：Obsidian 在启动时就把 `manifest.json` 读进内存缓存了（`app.plugins.manifests`），**重载插件不会重读它**，所以那个值会滞后 —— 实测把 manifest 改成 0.3.0 再重载插件，它仍然回 `0.2.1`。改版本号务必两处一起改。
+它取自 `main.js` 里的 `BUILD_VERSION` 常量。**不要读 `this.manifest.version`**：Obsidian 在启动时就把清单读进内存缓存了（`app.plugins.manifests`），**重载插件不会重读它**，所以那个值会滞后 —— 实测把 manifest 改成 0.3.0 再重载插件，它仍然回 `0.2.1`。改版本号务必两处一起改，`check-i18n.mjs` 会核对。
+
+（设置页顶部原本显示这行版本号，0.3.0 里已按要求删掉，面板不再挂版本号。）
+
+**卸载本插件后**，主题会干净回落到自己 `:root` 里的默认值 —— 插件写的行内变量在 `onunload` 里全部摘掉。
 
 ## 多语言
 
@@ -85,7 +79,14 @@ this.manifest.description = t('manifest.description');
 
 `manifest.json` 里那份写**英文**：社区目录全局可见，而且插件没启用（或安全模式）时用户看到的就是磁盘上那份，没机会被覆盖。中文靠上面这句运行时盖上去。离线自检第 ⑦ 条盯着「两份必须逐字一致」。
 
-开发时用来验证多语言的几个脚本（一份离线静态自检 + 两份真机 CDP 对照）没有随本仓库发布 —— 它们依赖作者本地的库目录结构和 CDP 调试端口，拿出去跑不起来。`main.js` 顶部的 `LOCALES` 表旁边写了那几个脚本各自在查什么，照着写一份并不难。
+三个自检脚本（都在 `项目/MikuNight/tools/`）：
+
+```powershell
+node 项目/MikuNight/tools/check-i18n.mjs            # 离线：语法 / 两张表键对齐 / 与译文源逐字比对 / 代码区残留写死文案 / 语言标签映射 / 版本号 / manifest 描述一致
+node 项目/MikuNight/tools/verify-i18n-cdp.mjs       # 真机：强制 zh 与 en 各重载一次插件，把设置面板的全部文字读回来比对
+node 项目/MikuNight/tools/verify-plugindesc-cdp.mjs # 真机：读「已安装插件」列表里真正渲染出来的那行介绍（需要开着设置窗口）
+node 项目/MikuNight/tools/shot-i18n-panel.mjs       # 真机：给设置面板拍中英对照图（打到 项目/MikuNight/shots/）
+```
 
 ## 插件负责的实现（为什么不能只靠 CSS）
 
@@ -106,18 +107,13 @@ this.manifest.description = t('manifest.description');
 | --- | --- | --- | --- |
 | 列表每级步进 | 1.5em | 1.5em | 1.5em |
 | bullet → 文字 | 1.6em | 1.6em | 1.6em |
-| 公式 / 正文 | 0.960 | 0.960 | 0.960 |
+| 公式 / 正文 | 1.100 | 1.100 | 1.100 |
 | 图片居中偏差 | 0px | 0px | 0px |
-
-公式那行等于 `--mn-math-scale` 的默认值 —— 它是纯比例，所以和字号无关（真机实测：15px 基准下公式为 14.4px，比值 0.96；把变量改成 1.2 则为 18px）。
 
 ## 安装
 
-**从社区目录装**（上架后）：设置 → 第三方插件 → 浏览 → 搜索 `MikuNight++` → 安装并启用。
-
-**手动装**：把 `main.js`、`manifest.json`、`styles.css` 放进 `<你的库>/.obsidian/plugins/mikunight-plus/`，然后在「设置 → 第三方插件 → 已安装插件」里启用。
-
-启用后：设置 → **MikuNight++**，行为开关 3 项 + 显示设置 4 项 + 配色 1 项 + 恢复默认。
+1. 设置 → 第三方插件 → 已安装插件，启用 **MikuNight++**
+2. 设置 → **MikuNight++**：行为开关 3 项 + 显示设置 4 项 + 配色 1 项
 
 无构建步骤：`main.js` 直接是 CommonJS，改完在插件列表里开关一次即可重载。界面文案随 Obsidian 的界面语言自动切换（简体中文 / 英语），不需要额外配置。
 
@@ -127,7 +123,7 @@ this.manifest.description = t('manifest.description');
 - **`---` 变标题修不了。** 那是 CommonMark 的 setext 语义，除非替换 markdown 解析器。请用「插入分割线」命令写 `<hr>`，或在段落与 `---` 之间空一行。
 - **标记隐藏是"全或全无"，不是逐行渐隐。** 开关只有两档：要么只显示光标所在行的标记（淡显 55%），要么所有行都正常显示。不会出现"某些行淡、某些行正常"的中间态。
 - **多光标时以"有哪些行被选中"为准。** 多选或整行选中（比如点行号槽）时，那一行的标记会淡显。
-- **主题侧的显示效果依赖主题 CSS。** 本插件的四个显示设置只是往 CSS 变量里写值，实际样式由配套主题 `MikuNight` 的 `theme.css` 定义；换别的主题这些设置不起作用。
+- **主题侧的显示效果依赖主题 CSS。** 本插件的四个显示设置只是往 CSS 变量里写值，实际样式由配套主题的 `theme.css` 定义；换别的主题这些设置不起作用。
 
 ## 致谢与许可
 
@@ -147,4 +143,3 @@ this.manifest.description = t('manifest.description');
 - `manifest.json` — 插件元信息
 - `main.js` — 全部逻辑（无构建步骤）。文件分两块：**第一块 `LOCALES` 文案表 + `t()`**，第二块功能实现
 - `styles.css` — 插件写进 DOM 的装饰类样式（标记隐藏 / 淡显），全 em 单位
-- `versions.json` — 版本 → 所需最低 app 版本，Obsidian 更新器靠它判断能不能升
