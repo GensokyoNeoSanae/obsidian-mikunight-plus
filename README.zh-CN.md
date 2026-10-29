@@ -6,7 +6,7 @@ MikuNight 主题的配套增强插件。提供主题的全部设置项，并做�
 
 **不依赖任何其他插件**（不需要 Style Settings）。**主题也不依赖本插件** —— 主题可以单独使用，只是没有设置界面，改 `theme.css` 里的 `:root` 变量即可。
 
-- 配套主题：[MikuNight](https://github.com/AsparagiSanae/obsidian-mikunight)（GPL-3.0）
+- 配套主题：[MikuNight](https://github.com/GensokyoNeoSanae/obsidian-mikunight)（GPL-3.0）
 - 本插件：MIT，见 [LICENSE](./LICENSE)
 - 最低支持 Obsidian **1.6.0**（见 `manifest.json` 的 `minAppVersion`）
 
@@ -140,7 +140,7 @@ this.manifest.description = t('manifest.description');
 
 配色方面，本插件只负责往 CSS 变量里写值（六个 HSL 裸数字），不参与任何派生计算。这套配色的默认取值参考了思源主题 [Neo](https://github.com/QYLexpired/Neo)（作者 QYL）的 Midnight 配色，公式源码的色值取自 [Catppuccin](https://github.com/catppuccin/catppuccin)（MIT）。
 
-插件代码是独立实现（不含上述项目的代码）。配套主题 [MikuNight](https://github.com/AsparagiSanae/obsidian-mikunight) 基于 Neo 改造、按 GPL-3.0 发布；两者许可证相互独立。
+插件代码是独立实现（不含上述项目的代码）。配套主题 [MikuNight](https://github.com/GensokyoNeoSanae/obsidian-mikunight) 基于 Neo 改造、按 GPL-3.0 发布；两者许可证相互独立。
 
 **许可证**：MIT，见 [LICENSE](./LICENSE)。
 

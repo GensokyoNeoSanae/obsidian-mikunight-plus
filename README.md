@@ -6,7 +6,7 @@ The companion enhancement plugin for the MikuNight theme. It provides every sett
 
 **It does not depend on any other plugin** (Style Settings not needed). **The theme does not depend on this plugin either** — the theme works on its own; you just get no settings panel, so you edit the `:root` variables in `theme.css` instead.
 
-- Companion theme: [MikuNight](https://github.com/AsparagiSanae/obsidian-mikunight) (GPL-3.0)
+- Companion theme: [MikuNight](https://github.com/GensokyoNeoSanae/obsidian-mikunight) (GPL-3.0)
 - This plugin: MIT, see [LICENSE](./LICENSE)
 - Requires Obsidian **1.6.0** or later (see `minAppVersion` in `manifest.json`)
 
@@ -140,7 +140,7 @@ Two of this plugin's editing behaviors are ported from the habits of [SiYuan](ht
 
 On colors, this plugin only writes values into CSS variables (six bare HSL numbers) and takes no part in any derived computation. The default values of this palette follow the Midnight color scheme of the SiYuan theme [Neo](https://github.com/QYLexpired/Neo) by QYL, and the formula source colors come from [Catppuccin](https://github.com/catppuccin/catppuccin) (MIT).
 
-The plugin code is an independent implementation; it contains no code from the projects above and is not affiliated with them. The companion theme [MikuNight](https://github.com/AsparagiSanae/obsidian-mikunight) is built on Neo and released under GPL-3.0; its license and this plugin's are independent of each other.
+The plugin code is an independent implementation; it contains no code from the projects above and is not affiliated with them. The companion theme [MikuNight](https://github.com/GensokyoNeoSanae/obsidian-mikunight) is built on Neo and released under GPL-3.0; its license and this plugin's are independent of each other.
 
 **License**: MIT, see [LICENSE](./LICENSE).
 
