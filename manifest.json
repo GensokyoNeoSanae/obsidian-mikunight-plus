@@ -3,7 +3,7 @@
   "name": "MikuNight++",
   "version": "0.3.0",
   "minAppVersion": "1.6.0",
-  "description": "Companion plugin for the MikuNight theme: a settings panel for the theme's variables (eight palette presets, spacing, math scale, gutter font) and the editor behaviours CSS cannot do, such as hiding markup off the cursor line.",
+  "description": "Settings panel for the MikuNight theme — eight palettes, spacing, formula scale, gutter font — plus the editor behaviours CSS cannot do. | MikuNight 主题的配套设置面板：八套配色、行距、公式字号、行号字体，外加 CSS 做不到的编辑器行为。",
   "author": "AsparagiSanae",
   "isDesktopOnly": false
 }

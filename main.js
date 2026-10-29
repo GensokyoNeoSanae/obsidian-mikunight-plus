@@ -63,11 +63,10 @@ const BUILD_VERSION = '0.3.0';
 
 const LOCALES = {
   zh: {
-    /* 插件列表里那行介绍。manifest.json 里写的是英文（社区目录全局可见），
-       中文这份由 onload 覆盖上去，见 onload 里的说明。 */
-    'manifest.description': 'MikuNight 主题的配套插件：主题全部设置项（八套配色预设、空行高度、'
-      + '公式字号、行号字体…），加上那些纯 CSS 做不到的编辑行为 —— 隐藏非光标行的标记、'
-      + '退格整对删除标记、点击行号槽选中整行。',
+    /* 插件列表里那行介绍。manifest.json 里现在写的是「英 | 中」双语（社区目录对所有人可见），
+       中文界面下由 onload 换成下面这条纯中文，见 onload 里的说明。 */
+    'manifest.description': 'MikuNight 主题的配套设置面板：八套配色、行距、公式字号、行号字体，'
+      + '外加 CSS 做不到的编辑器行为。',
 
     'cmd.insertHr': '插入分割线（<hr>，不会被解析成标题）',
 
@@ -120,8 +119,10 @@ const LOCALES = {
      （含转义方式），改动请两边一起改，tools/check-i18n.mjs 会核对键与值。 */
   en: {
     /* 这一条与 manifest.json 里的 description 必须逐字一致（check-i18n.mjs 第 ⑦ 条核对）：
-       插件没被启用 / 安全模式下，用户看到的就是磁盘上那份，没机会被 onload 覆盖。 */
-    "manifest.description": "Companion plugin for the MikuNight theme: a settings panel for the theme's variables (eight palette presets, spacing, math scale, gutter font) and the editor behaviours CSS cannot do, such as hiding markup off the cursor line.",
+       插件没被启用 / 安全模式下，用户看到的就是磁盘上那份，没机会被 onload 覆盖。
+       磁盘那份现在是「英 | 中」双语（社区目录对所有人可见），所以这里也照抄双语；
+       只有中文界面才由上面 zh 那条换成纯中文。 */
+    "manifest.description": "Settings panel for the MikuNight theme — eight palettes, spacing, formula scale, gutter font — plus the editor behaviours CSS cannot do. | MikuNight 主题的配套设置面板：八套配色、行距、公式字号、行号字体，外加 CSS 做不到的编辑器行为。",
 
     "cmd.insertHr": "Insert divider (<hr>, not parsed as a heading)",
 
