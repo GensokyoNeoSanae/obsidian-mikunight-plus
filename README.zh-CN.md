@@ -1,5 +1,7 @@
 # MikuNight++
 
+<p><a href="./README.md">English</a> · 简体中文</p>
+
 MikuNight 主题的配套增强插件。提供主题的全部设置项，并做那些**纯 CSS 做不到**的事：需要读取编辑器状态、语法树、光标位置，或需要改写文档的行为。
 
 **不依赖任何其他插件**（不需要 Style Settings）。**主题也不依赖本插件** —— 主题可以单独使用，只是没有设置界面，改 `theme.css` 里的 `:root` 变量即可。
@@ -138,7 +140,7 @@ this.manifest.description = t('manifest.description');
 
 配色方面，本插件只负责往 CSS 变量里写值（六个 HSL 裸数字），不参与任何派生计算。这套配色的默认取值参考了思源主题 [Neo](https://github.com/QYLexpired/Neo)（作者 QYL）的 Midnight 配色，公式源码的色值取自 [Catppuccin](https://github.com/catppuccin/catppuccin)（MIT）。
 
-插件代码为独立实现，不含上述项目的任何代码，与之也没有隶属关系。配套主题 [MikuNight](https://github.com/AsparagiSanae/obsidian-mikunight) 基于 Neo 改造、按 GPL-3.0 发布；本插件与它许可证相互独立。
+插件代码是独立实现（不含上述项目的代码）。配套主题 [MikuNight](https://github.com/AsparagiSanae/obsidian-mikunight) 基于 Neo 改造、按 GPL-3.0 发布；两者许可证相互独立。
 
 **许可证**：MIT，见 [LICENSE](./LICENSE)。
 
@@ -147,4 +149,5 @@ this.manifest.description = t('manifest.description');
 - `manifest.json` — 插件元信息
 - `main.js` — 全部逻辑（无构建步骤）。文件分两块：**第一块 `LOCALES` 文案表 + `t()`**，第二块功能实现
 - `styles.css` — 插件写进 DOM 的装饰类样式（标记隐藏 / 淡显），全 em 单位
+- `tools/presets-hsl.mjs` — 配色体检脚本：打印每套预设的真实 hex、对背景与对正文的对比度，并按「色相 / 饱和度 / 明暗」三项判据标出观感重复的两套。纯 Node，不依赖任何包，也不读写文件，见 `tools/README.md`
 - `versions.json` — 版本 → 所需最低 app 版本，Obsidian 更新器靠它判断能不能升

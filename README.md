@@ -1,5 +1,7 @@
 # MikuNight++
 
+<p>English · <a href="./README.zh-CN.md">简体中文</a></p>
+
 The companion enhancement plugin for the MikuNight theme. It provides every setting the theme has, and does the things **plain CSS cannot**: the ones that need to read editor state, the syntax tree or the cursor position, or that need to rewrite the document.
 
 **It does not depend on any other plugin** (Style Settings not needed). **The theme does not depend on this plugin either** — the theme works on its own; you just get no settings panel, so you edit the `:root` variables in `theme.css` instead.
@@ -147,4 +149,5 @@ The plugin code is an independent implementation; it contains no code from the p
 - `manifest.json` — plugin metadata
 - `main.js` — all the logic (no build step). The file has two blocks: **the first is the `LOCALES` string tables plus `t()`**, the second is the implementation
 - `styles.css` — styles for the decoration classes the plugin writes into the DOM (markup hidden / dimmed), all in em units
+- `tools/presets-hsl.mjs` — palette audit: prints each preset's actual hex, its contrast against the background and against body text, and flags any two presets that read as the same color by hue, saturation and nearby luminance. Plain Node, no dependencies, no file I/O — see `tools/README.md`
 - `versions.json` — version → required minimum app version; Obsidian's updater uses it to decide whether an update can be installed
